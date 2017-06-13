@@ -1,0 +1,21 @@
+{
+  "timeZone": "GMT",
+  "dependencies": {
+    "libraries": [{
+      "userSymbol": "AddOnCardBuilder",
+      "libraryId": "1jbH2pA7h75DrjbqM-R5gRYAH96b4TWd-c5JI8KyDQYF0fIM7NtYWcHS9",
+      "version": "stable"
+    }]
+  },
+  "gmail": {
+    "name": "Expense It!",
+    "logoUrl": "https://www.gstatic.com/images/icons/material/system/1x/receipt_black_24dp.png",
+    "contextualTriggers": [{
+      "unconditional": {
+      },
+      "onTriggerFunction": "getContextualAddOn"
+    }],
+    "primaryColor": "#41f470",
+    "secondaryColor": "#94f441"
+  }
+}
