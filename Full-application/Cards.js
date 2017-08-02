@@ -25,49 +25,59 @@ var FIELDNAMES = ['Date', 'Amount', 'Description', 'Spreadsheet URL'];
  * @returns {Card}
  */
 function createExpensesCard(opt_prefills, opt_status) {
-  var card = AddOnCardBuilder.createCard()
-      .setHeader(AddOnCardBuilder
-          .createCardHeader()
-          .setTitle('Log Your Expense'));
+  var card = CardService.newCardBuilder();
+  card.setHeader(CardService.newCardHeader().setTitle('Log Your Expense'));
+
+  var clearForm = CardService.newFormAction()
+    .setMethodName('clearForm')
+    .setParameters({'Status': opt_status ? opt_status : ''});
+  var clearAction = CardService.newCardAction()
+    .setText('Clear form')
+    .setOnClickAction(clearForm);
+  card.addCardAction(clearAction);
+
   if (opt_status) {
     if (opt_status.indexOf('Error: ') == 0) {
       opt_status = '<font color=\'#FF0000\'>' + opt_status + '</font>';
     } else {
       opt_status = '<font color=\'#228B22\'>' + opt_status + '</font>';
     }
-    card.addSection(AddOnCardBuilder
-        .createCardSection()
-        .addWidget(AddOnCardBuilder
-            .createTextParagraph('<b>' + opt_status + '</b>')));
+    var statusSection = CardService.newCardSection();
+    statusSection.addWidget(CardService.newTextParagraph()
+      .setText('<b>' + opt_status + '</b>'));
+    card.addSection(statusSection);
   }
+
   var id = PropertiesService.getUserProperties().getProperty('EXPENSE_ID');
   if (! id) {
     id = '0';
     PropertiesService.getUserProperties().setProperty('EXPENSE_ID', '0');
   }
-  var formSection = addFields(AddOnCardBuilder
-      .createCardSection()
-      .addWidget(AddOnCardBuilder.createTextParagraph('Expense ID #' + id)),
-                              FIELDNAMES, opt_prefills);
-  return card
-      .addSection(formSection
-          .addWidget(AddOnCardBuilder
-              .createButtonSet()
-              .addButton(AddOnCardBuilder
-                  .createTextButton('Submit')
-                  .setOnClickAction('submitForm'))))
-      .addSection(AddOnCardBuilder
-          .createCardSection()
-          .addWidget(AddOnCardBuilder.createTextInput('Sheet Name', 'Sheet Name'))
-          .addWidget(AddOnCardBuilder
-              .createButtonSet()
-              .addButton(AddOnCardBuilder
-                  .createTextButton('New Sheet')
-                  .setOnClickAction('createExpensesSheet'))))
-      .addAction(AddOnCardBuilder
-          .createCardAction()
-          .setText('Clear form')
-          .setOnClickAction('clearForm', {'Status': opt_status ? opt_status : ''}));
+  var idLabel = CardService.newTextParagraph().setText('Expense ID #' + id);
+  var baseSection = CardService.newCardSection().addWidget(idLabel);
+  var formSection = createFormSection(baseSection, FIELDNAMES, opt_prefills);
+  var submitForm = CardService.newFormAction().setMethodName('submitForm');
+  var submitButton = CardService.newTextButton()
+    .setText('Submit')
+    .setOnClickAction(submitForm);
+  formSection.addWidget(CardService.newButtonSet().addButton(submitButton));
+
+  var newSheetSection = CardService.newCardSection();
+  var sheetName = CardService.newTextInput()
+    .setFieldName('Sheet Name')
+    .setTitle('Sheet Name');
+  var createExpensesSheet = CardService.newFormAction()
+    .setMethodName('createExpensesSheet');
+  var newSheetButton = CardService.newTextButton()
+    .setText('New Sheet')
+    .setOnClickAction(createExpensesSheet);
+  newSheetSection.addWidget(sheetName);
+  newSheetSection.addWidget(CardService.newButtonSet().addButton(newSheetButton));
+
+  card.addSection(formSection);
+  card.addSection(newSheetSection);
+
+  return card;
 }
 
 /**
@@ -78,14 +88,17 @@ function createExpensesCard(opt_prefills, opt_status) {
  * @param {Array.<String>} opt_prefills Default values for each input field.
  * @returns {CardSection}
  */
-function addFields(section, inputNames, opt_prefills) {
+function createFormSection(section, inputNames, opt_prefills) {
   for (var i = 0; i < inputNames.length; i++) {
-    var widget = AddOnCardBuilder.createTextInput(inputNames[i], inputNames[i]);
+    var widget = CardService.newTextInput()
+      .setFieldName(inputNames[i])
+      .setTitle(inputNames[i]);
     if (opt_prefills && opt_prefills[i]) {
       widget.setValue(opt_prefills[i]);
     }
     section.addWidget(widget);
   }
+
   return section;
 }
 
@@ -105,24 +118,45 @@ function submitForm(e) {
       }
     });
     var sheet = SpreadsheetApp
-        .openByUrl((res['Spreadsheet URL']))
-        .getActiveSheet();
+      .openByUrl((res['Spreadsheet URL']))
+      .getActiveSheet();
     var props = PropertiesService.getUserProperties();
     var id = props.getProperty('EXPENSE_ID');
     sheet.appendRow([id].concat(objToArray(res, FIELDNAMES.slice(0, FIELDNAMES.length - 1))));
     props.setProperty('EXPENSE_ID', (parseInt(id) + 1).toString());
     props.setProperty('SPREADSHEET_URL', res['Spreadsheet URL']);
-    return createEditCard(res, 'Logged expense successfully!')
-        .buildResult();
+    return createEditCard(res, 'Logged expense successfully!').build();
   }
   catch (err) {
     if (err == 'Exception: Invalid argument: url') {
       err = 'Invalid URL';
       res['Spreadsheet URL'] = null;
     }
-    return createExpensesCard(objToArray(res, FIELDNAMES), 'Error: ' + err)
-        .buildResult();
+    return createExpensesCard(objToArray(res, FIELDNAMES), 'Error: ' + err).build();
   }
+}
+
+/**
+ * Returns an array corresponding to the given object and desired ordering of keys.
+ *
+ * @param {Object} obj Objected whose values will be returned as an array.
+ * @param {Array.<string>} keys An array of key names in the desired order.
+ * @returns {Array}
+ */
+function objToArray(obj, keys) {
+  return keys.map(function(key) {
+    return obj[key];
+  });
+}
+
+/**
+ * Recreates the main card without prefilled data.
+ *
+ * @param {Event} e An event object containing form inputs and parameters.
+ * @returns {Card}
+ */
+function clearForm(e) {
+  return createExpensesCard(null, e['parameters']['Status']).build();
 }
 
 /**
@@ -137,30 +171,18 @@ function createExpensesSheet(e) {
   newSpreadsheet = SpreadsheetApp.create(sheetName);
   newSpreadsheet.setFrozenRows(1);
   newSpreadsheet
-      .getActiveSheet()
-      .getRange(1, 1, 1, FIELDNAMES.length)
-      .setValues([['Expense ID'].concat(FIELDNAMES.slice(0, FIELDNAMES.length - 1))]);
+    .getActiveSheet()
+    .getRange(1, 1, 1, FIELDNAMES.length)
+    .setValues([['Expense ID'].concat(FIELDNAMES.slice(0, FIELDNAMES.length - 1))]);
   newSpreadsheet
-      .getRange('Sheet1!A:A')
-      .protect()
-      .setDescription('IDs Protected')
-      .setWarningOnly(true);
+    .getRange('Sheet1!A:A')
+    .protect()
+    .setDescription('IDs Protected')
+    .setWarningOnly(true);
   var prefills = objToArray(res, FIELDNAMES.slice(0, FIELDNAMES.length - 1));
   prefills.push(newSpreadsheet.getUrl());
   return createExpensesCard(prefills, 'Created and linked the spreadsheet <i>' +
-                            sheetName + '</i> for expenses!')
-      .buildResult();
-}
-
-/**
- * Recreates the main card without prefilled data.
- *
- * @param {Event} e An event object containing form inputs and parameters.
- * @returns {Card}
- */
-function clearForm(e) {
-  return createExpensesCard(null, e['parameters']['Status'])
-      .buildResult();
+                            sheetName + '</i> for expenses!').build();
 }
 
 /**
@@ -175,41 +197,62 @@ function createEditCard(prevResults, opt_status) {
   if (prevResults) {
     var prefills = objToArray(prevResults, FIELDNAMES.slice(0, FIELDNAMES.length - 1));
   }
-  var card = AddOnCardBuilder.createCard()
-      .setHeader(AddOnCardBuilder
-          .createCardHeader()
-          .setTitle('Edit Your Expense'));
+  var card = CardService.newCardBuilder();
+  card.setHeader(CardService.newCardHeader().setTitle('Edit Your Expense'));
+
+  var clearEditForm = CardService.newFormAction()
+    .setMethodName('clearEditForm')
+    .setParameters({'Status': opt_status ? opt_status : ''});
+  var clearAction = CardService.newCardAction()
+    .setText('Clear form')
+    .setOnClickAction(clearEditForm);
+  card.addCardAction(clearAction);
+
   if (opt_status) {
     if (opt_status.indexOf('Error: ') == 0) {
       opt_status = '<font color=\'#FF0000\'>' + opt_status + '</font>';
     } else {
       opt_status = '<font color=\'#228B22\'>' + opt_status + '</font>';
     }
-    card.addSection(AddOnCardBuilder
-        .createCardSection()
-        .addWidget(AddOnCardBuilder
-            .createTextParagraph('<b>' + opt_status + '</b>')))
+    var statusSection = CardService.newCardSection();
+    statusSection.addWidget(CardService.newTextParagraph()
+      .setText('<b>' + opt_status + '</b>'));
+    card.addSection(statusSection);
   }
+
   var id = (parseInt(PropertiesService.getUserProperties().getProperty('EXPENSE_ID')) - 1)
-      .toString();
-  var formSection = addFields(AddOnCardBuilder
-    .createCardSection()
-    .addWidget(AddOnCardBuilder.createTextParagraph('Expense ID #' + id)),
-                              FIELDNAMES.slice(0, FIELDNAMES.length - 1), prefills);
-  return card
-      .addSection(formSection
-          .addWidget(AddOnCardBuilder
-              .createButtonSet()
-              .addButton(AddOnCardBuilder
-                  .createTextButton('Edit')
-                  .setOnClickAction('editForm'))))
-      .addSection(AddOnCardBuilder
-          .createCardSection()
-          .addWidget(spreadsheetButton('Open Spreadsheet')))
-      .addAction(AddOnCardBuilder
-          .createCardAction()
-          .setText('Clear form')
-          .setOnClickAction('clearEditForm', {'Status': opt_status ? opt_status : ''}));
+    .toString();
+  var idLabel = CardService.newTextParagraph().setText('Expense ID #' + id);
+  var baseSection = CardService.newCardSection().addWidget(idLabel);
+  var formSection = createFormSection(baseSection,
+                                      FIELDNAMES.slice(0, FIELDNAMES.length - 1), prefills);
+  var editForm = CardService.newFormAction().setMethodName('editForm');
+  var editButton = CardService.newTextButton()
+    .setText('Edit')
+    .setOnClickAction(editForm);
+  formSection.addWidget(CardService.newButtonSet().addButton(editButton));
+
+  var url = PropertiesService.getUserProperties().getProperty('SPREADSHEET_URL');
+  var openSpreadsheetButton = CardService.newTextButton()
+    .setText('Open Spreadsheet')
+    .setOpenLink(CardService.newOpenLink().setUrl(url));
+  var openSpreadsheetSection = CardService.newCardSection()
+    .addWidget(CardService.newButtonSet().addButton(openSpreadsheetButton));
+
+  card.addSection(formSection);
+  card.addSection(openSpreadsheetSection);
+
+  return card;
+}
+
+/**
+ * Recreates the edit card without prefilled data.
+ *
+ * @param {Event} e Callback event object, which contains status.
+ * @returns {Card}
+ */
+function clearEditForm(e) {
+  return createEditCard(null, e['parameters']['Status']).build();
 }
 
 /**
@@ -235,53 +278,12 @@ function editForm(e) {
       if (sheet.getRange(i, 1).getValue() == id) {
         var newValues = objToArray(res, FIELDNAMES.slice(0, FIELDNAMES.length - 1));
         sheet.getRange(i, 2, 1, FIELDNAMES.length - 1).setValues([newValues]);
-        return createEditCard(res, 'Edited expense successfully!')
-            .buildResult();
+        return createEditCard(res, 'Edited expense successfully!').build();
       }
     }
     throw 'expense ID not found in sheet';
   }
   catch (err) {
-    return createEditCard(res, 'Error: ' + err).buildResult();
+    return createEditCard(res, 'Error: ' + err).build();
   }
-}
-
-/**
- * Recreates the edit card without prefilled data.
- *
- * @param {Event} e Callback event object, which contains status.
- * @returns {Card}
- */
-function clearEditForm(e) {
-  return createEditCard(null, e['parameters']['Status'])
-      .buildResult();
-}
-
-/**
- * Returns a widget linking to spreadsheet.
- *
- * @param {String} text Text displayed on button.
- * @returns {ButtonSet}
- */
-function spreadsheetButton(text) {
-  return AddOnCardBuilder
-              .createButtonSet()
-              .addButton(AddOnCardBuilder
-                  .createTextButton(text)
-                  .setOnClickUrl(PropertiesService
-                      .getUserProperties()
-                      .getProperty('SPREADSHEET_URL')));
-}
-
-/**
- * Returns an array corresponding to the given object and desired ordering of keys.
- *
- * @param {Object} obj Objected whose values will be returned as an array.
- * @param {Array.<string>} keys An array of key names in the desired order.
- * @returns {Array}
- */
-function objToArray(obj, keys) {
-  return keys.map(function(key) {
-    return obj[key];
-  });
 }

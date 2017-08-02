@@ -1,11 +1,6 @@
 {
   "timeZone": "GMT",
   "dependencies": {
-    "libraries": [{
-      "userSymbol": "AddOnCardBuilder",
-      "libraryId": "1jbH2pA7h75DrjbqM-R5gRYAH96b4TWd-c5JI8KyDQYF0fIM7NtYWcHS9",
-      "version": "stable"
-    }]
   },
   "gmail": {
     "name": "Expense It!",

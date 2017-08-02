@@ -22,8 +22,8 @@
  * @returns {String}
  */
 function getLargestAmount(message) {
-  var messageBody = message.getPlainBody();
   var amount = 0;
+  var messageBody = message.getPlainBody();
   var regex = /\$[\d,]+\.\d\d/g;
   var match = regex.exec(messageBody);
   while (match) {

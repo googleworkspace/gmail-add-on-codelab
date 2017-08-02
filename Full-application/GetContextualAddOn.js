@@ -28,7 +28,7 @@ function getContextualAddOn(messageId) {
                   getLargestAmount(message),
                   getExpenseDescription(message),
                   getSheetUrl()];
-  var addOn = AddOnCardBuilder.createContextualAddOn()
-      .addCard(createExpensesCard(prefills));
-  return addOn.buildResult();
+  var card = createExpensesCard(prefills);
+
+  return [card.build()];
 }
