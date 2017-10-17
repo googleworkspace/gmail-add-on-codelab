@@ -1,3 +1,19 @@
+/**
+ * Copyright 2017 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var FIELDNAMES = ['Date', 'Amount', 'Description', 'Spreadsheet URL'];
 
 /**
@@ -12,8 +28,8 @@ function createExpensesCard(opt_prefills, opt_status) {
   var card = CardService.newCardBuilder();
   card.setHeader(CardService.newCardHeader().setTitle('Log Your Expense'));
 
-  var clearForm = CardService.newFormAction()
-    .setMethodName('clearForm')
+  var clearForm = CardService.newAction()
+    .setFunctionName('clearForm')
     .setParameters({'Status': opt_status ? opt_status : ''});
   var clearAction = CardService.newCardAction()
     .setText('Clear form')
@@ -39,8 +55,8 @@ function createExpensesCard(opt_prefills, opt_status) {
   var sheetName = CardService.newTextInput()
     .setFieldName('Sheet Name')
     .setTitle('Sheet Name');
-  var createExpensesSheet = CardService.newFormAction()
-    .setMethodName('createExpensesSheet');
+  var createExpensesSheet = CardService.newAction()
+    .setFunctionName('createExpensesSheet');
   var newSheetButton = CardService.newTextButton()
     .setText('New Sheet')
     .setOnClickAction(createExpensesSheet);
@@ -72,7 +88,7 @@ function createFormSection(section, inputNames, opt_prefills) {
     section.addWidget(widget);
   }
 
-  var submitForm = CardService.newFormAction().setMethodName('submitForm');
+  var submitForm = CardService.newAction().setFunctionName('submitForm');
   var submitButton = CardService.newTextButton()
     .setText('Submit')
     .setOnClickAction(submitForm);
@@ -115,7 +131,7 @@ function submitForm(e) {
 /**
  * Returns an array corresponding to the given object and desired ordering of keys.
  *
- * @param {Object} obj Objected whose values will be returned as an array.
+ * @param {Object} obj Object whose values will be returned as an array.
  * @param {Array.<string>} keys An array of key names in the desired order.
  * @returns {Array}
  */

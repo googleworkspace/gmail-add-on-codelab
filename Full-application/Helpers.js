@@ -18,7 +18,7 @@
  * Finds largest dollar amount from email body.
  * Returns null if no dollar amount is found.
  *
- * @param {String} message The message that is currently open.
+ * @param {Message} message The message that is currently open.
  * @returns {String}
  */
 function getLargestAmount(message) {
@@ -36,7 +36,7 @@ function getLargestAmount(message) {
 /**
  * Determines date the email was received.
  *
- * @param {String} message The message that is currently open.
+ * @param {Message} message The message that is currently open.
  * @returns {String}
  */
 function getReceivedDate(message) {
@@ -46,7 +46,7 @@ function getReceivedDate(message) {
 /**
  * Determines expense description by joining sender name and message subject.
  *
- * @param {String} message The message that is currently open.
+ * @param {Message} message The message that is currently open.
  * @returns {String}
  */
 function getExpenseDescription(message) {

@@ -19,11 +19,11 @@
  * the current e-mail thread. This function satisfies the requirements of
  * an 'onTriggerFunction' and is specified in the add-on's manifest.
  *
- * @param {String} messageId The ID of the message currently open.
- * @returns {ContextualAddOn}
+ * @param {Object} event Event containing the message ID and other context.
+ * @returns {Card[]}
  */
-function getContextualAddOn(messageId) {
-  var message = GmailApp.getMessageById(messageId);
+function getContextualAddOn(event) {
+  var message = getCurrentMessage(event);
   var prefills = [getReceivedDate(message),
                   getLargestAmount(message),
                   getExpenseDescription(message),
@@ -31,4 +31,16 @@ function getContextualAddOn(messageId) {
   var card = createExpensesCard(prefills);
 
   return [card.build()];
+}
+
+/**
+ * Retrieves the current message given an action event object.
+ * @param {Event} event An action event object
+ * @return {Message}
+ */
+function getCurrentMessage(event) {
+  var accessToken = event.messageMetadata.accessToken;
+  var messageId = event.messageMetadata.messageId;
+  GmailApp.setCurrentMessageAccessToken(accessToken);
+  return GmailApp.getMessageById(messageId);
 }

@@ -28,8 +28,8 @@ function createExpensesCard(opt_prefills, opt_status) {
   var card = CardService.newCardBuilder();
   card.setHeader(CardService.newCardHeader().setTitle('Log Your Expense'));
 
-  var clearForm = CardService.newFormAction()
-    .setMethodName('clearForm')
+  var clearForm = CardService.newAction()
+    .setFunctionName('clearForm')
     .setParameters({'Status': opt_status ? opt_status : ''});
   var clearAction = CardService.newCardAction()
     .setText('Clear form')
@@ -56,7 +56,7 @@ function createExpensesCard(opt_prefills, opt_status) {
   var idLabel = CardService.newTextParagraph().setText('Expense ID #' + id);
   var baseSection = CardService.newCardSection().addWidget(idLabel);
   var formSection = createFormSection(baseSection, FIELDNAMES, opt_prefills);
-  var submitForm = CardService.newFormAction().setMethodName('submitForm');
+  var submitForm = CardService.newAction().setFunctionName('submitForm');
   var submitButton = CardService.newTextButton()
     .setText('Submit')
     .setOnClickAction(submitForm);
@@ -66,8 +66,8 @@ function createExpensesCard(opt_prefills, opt_status) {
   var sheetName = CardService.newTextInput()
     .setFieldName('Sheet Name')
     .setTitle('Sheet Name');
-  var createExpensesSheet = CardService.newFormAction()
-    .setMethodName('createExpensesSheet');
+  var createExpensesSheet = CardService.newAction()
+    .setFunctionName('createExpensesSheet');
   var newSheetButton = CardService.newTextButton()
     .setText('New Sheet')
     .setOnClickAction(createExpensesSheet);
@@ -139,7 +139,7 @@ function submitForm(e) {
 /**
  * Returns an array corresponding to the given object and desired ordering of keys.
  *
- * @param {Object} obj Objected whose values will be returned as an array.
+ * @param {Object} obj Object whose values will be returned as an array.
  * @param {Array.<string>} keys An array of key names in the desired order.
  * @returns {Array}
  */
@@ -200,8 +200,8 @@ function createEditCard(prevResults, opt_status) {
   var card = CardService.newCardBuilder();
   card.setHeader(CardService.newCardHeader().setTitle('Edit Your Expense'));
 
-  var clearEditForm = CardService.newFormAction()
-    .setMethodName('clearEditForm')
+  var clearEditForm = CardService.newAction()
+    .setFunctionName('clearEditForm')
     .setParameters({'Status': opt_status ? opt_status : ''});
   var clearAction = CardService.newCardAction()
     .setText('Clear form')
@@ -226,7 +226,7 @@ function createEditCard(prevResults, opt_status) {
   var baseSection = CardService.newCardSection().addWidget(idLabel);
   var formSection = createFormSection(baseSection,
                                       FIELDNAMES.slice(0, FIELDNAMES.length - 1), prefills);
-  var editForm = CardService.newFormAction().setMethodName('editForm');
+  var editForm = CardService.newAction().setFunctionName('editForm');
   var editButton = CardService.newTextButton()
     .setText('Edit')
     .setOnClickAction(editForm);
