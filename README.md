@@ -12,7 +12,7 @@
 
  ## Getting Started
 
- You can follow [this codelab](g.co/codelabs/gmail-add-ons) to build a
+ You can follow [this codelab](https://g.co/codelabs/gmail-add-ons) to build a
  simplified version of the add-on.
 
 
