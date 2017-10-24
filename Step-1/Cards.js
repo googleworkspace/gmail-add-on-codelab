@@ -20,7 +20,7 @@ var FIELDNAMES = ['Date', 'Amount', 'Description', 'Spreadsheet URL'];
  * Creates the main card users see with form inputs to log expense.
  * Form can be prefilled with values.
  *
- * @param {Array.<String>} opt_prefills Default values for each input field.
+ * @param {String[]} opt_prefills Default values for each input field.
  * @param {String} opt_status Optional status displayed at top of card.
  * @returns {Card}
  */
@@ -51,8 +51,8 @@ function createExpensesCard(opt_prefills, opt_status) {
  * Creates form section to be displayed on card.
  *
  * @param {CardSection} section The card section to which form items are added.
- * @param {Array.<String>} inputNames Names of titles for each input field.
- * @param {Array.<String>} opt_prefills Default values for each input field.
+ * @param {String[]} inputNames Names of titles for each input field.
+ * @param {String[]} opt_prefills Default values for each input field.
  * @returns {CardSection}
  */
 function createFormSection(section, inputNames, opt_prefills) {
