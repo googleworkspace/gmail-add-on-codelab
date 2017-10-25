@@ -15,7 +15,7 @@
       },
       "onTriggerFunction": "getContextualAddOn",
       "openLinkUrlPrefixes": [
-          "https://docs.google.com/
+          "https://docs.google.com/"
       ],
     }],
     "primaryColor": "#41f470",
