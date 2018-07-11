@@ -22,13 +22,17 @@
  or mobile and find an electronic receipt. Click on the icon vaguely resembling
  a receipt:
  ![receiptPicture](https://www.gstatic.com/images/icons/material/system/1x/receipt_black_24dp.png).
+ 
  A form for specifying details about the expense will appear, with the fields
  already filled. Edit as necessary and submit the form, thereby adding
  information to a spreadsheet. You can also create a new spreadsheet from within
  the add-on.
  
+ ### If you cannot see the Add-on Icon:
  If you cannot see the add-on Icon, then try the following - go to your Gmail Settings (the Icon appears like a Gear/Cog) and change the display density to 'compact'. After you've done so, now you should be able to see the icon. 
-
+ 
+ 
+![See diagram here.](https://github.com/BKSpurgeon/gmail-add-ons/blob/patch-1/Step-4/changeSettings.png)
 
  ## License
 
