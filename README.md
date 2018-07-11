@@ -26,6 +26,8 @@
  already filled. Edit as necessary and submit the form, thereby adding
  information to a spreadsheet. You can also create a new spreadsheet from within
  the add-on.
+ 
+ If you cannot see the add-on Icon, then try the following - go to your Gmail Settings (the Icon appears like a Gear/Cog) and change the display density to 'compact'. After you've done so, now you should be able to see the icon. 
 
 
  ## License
