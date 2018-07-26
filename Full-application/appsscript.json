@@ -13,11 +13,9 @@
     "contextualTriggers": [{
       "unconditional": {
       },
-      "onTriggerFunction": "getContextualAddOn",
-      "openLinkUrlPrefixes": [
-          "https://docs.google.com/"
-      ],
+      "onTriggerFunction": "getContextualAddOn"
     }],
+    "openLinkUrlPrefixes": ["https://docs.google.com/"],
     "primaryColor": "#41f470",
     "secondaryColor": "#94f441"
   }
