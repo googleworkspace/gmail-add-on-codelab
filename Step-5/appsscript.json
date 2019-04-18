@@ -7,7 +7,6 @@
     "https://www.googleapis.com/auth/script.storage"
   ],
   "gmail": {
-    "version": "TRUSTED_TESTER_V2",
     "name": "Expense It!",
     "logoUrl": "https://www.gstatic.com/images/icons/material/system/1x/receipt_black_24dp.png",
     "contextualTriggers": [{
